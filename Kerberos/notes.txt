@@ -1,0 +1,44 @@
+PS C:\Users\administrator\Desktop> Enter-PSSession -ComputerName f3c1ex1.c1.f3.net -Authentication credssp -Credential $c
+[f3c1ex1.c1.f3.net]: PS C:\Users\administrator.C1\Documents> Import-Module Kerberos
+[f3c1ex1.c1.f3.net]: PS C:\Users\administrator.C1\Documents> Get-Tickets
+
+WARNING: column "Flags" does not fit into the display and was removed.
+
+ServerName       Realm     StartTime            EndTime              Enc. Type
+----------       -----     ---------            -------              ---------
+krbtgt/C1.F3.NET C1.F3.NET 8/24/2011 5:54:15 PM 8/25/2011 3:54:15 AM AES256_CTS_HMAC_S...
+
+
+PS C:\Users\administrator\Desktop> Enter-PSSession -ComputerName f3c1ex1.c1.f3.net
+[f3c1ex1.c1.f3.net]: PS C:\Users\administrator.C1\Documents> Import-Module Kerberos
+64-Bit Types added
+Kerberos Module loaded
+[f3c1ex1.c1.f3.net]: PS C:\Users\administrator.C1\Documents> Get-Tickets
+Exception calling "GetTickets" with "0" argument(s): "Unknown error (0xc000005f)"
+At C:\Users\administrator.C1\Documents\WindowsPowerShell\Modules\Kerberos\Kerberos.psm1:6
+3 char:48
++         [KerberosLib.KerberosTicketCache]::GetTickets <<<< ()
+    + CategoryInfo          : NotSpecified: (:) [], MethodInvocationException
+    + FullyQualifiedErrorId : DotNetMethodException
+
+
+PS C:\Users\administrator\Desktop> try { $tickets = Get-Tickets; Write-Host "Have a Kerber
+os TGT to authenticate" } catch [Exception] { Write-Host "Do not have a Kerberos TGT" }
+Have a Kerberos TGT to authenticate
+
+
+PS C:\Users\administrator\Desktop> Enter-PSSession f3c1srv1
+[f3c1srv1]: PS C:\Users\administrator.C1\Documents> Import-Module Kerberos
+64-Bit Types added
+Kerberos Module loaded
+[f3c1srv1]: PS C:\Users\administrator.C1\Documents> try
+>> {
+>>     $tickets = Get-Tickets | Where-Object { $_.ServerName -like "krbtgt*" }
+>>     Write-Host "Have a Kerberos TGT to authenticate"
+>> }
+>> catch [Exception]
+>> {
+>>     Write-Host "Do not have a Kerberos TGT:" $_.Exception.Message
+>> }
+>>
+Do not have a Kerberos TGT: Unknown error (0xc000005f)
